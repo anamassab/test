@@ -1,0 +1,83 @@
+-- 1862 produtos diferentes
+SELECT
+  count (DISTINCT product_id)
+FROM
+  `my-project-test-402823.data.orders`
+
+
+-- tentando descobrir o preço unitário do produto, podemos perceber que temos diferentes valores na unidade
+-- * filtrei um produto em especifico para melhor velocidade da consulta
+SELECT
+  product_id,
+  sales,
+  quantity,
+  sales / quantity
+FROM
+  `my-project-test-402823.data.orders`
+WHERE
+  product_id = 'FUR-TA-10000577'
+GROUP BY
+  product_id,
+  sales,
+  quantity
+
+
+-- trazendo a região para a análise, podemos encontrar valores iguais dentros da mesma região. Porém, ainda temos variação de valor.
+SELECT
+  product_id,
+  sales,
+  quantity,
+  region,
+  sales / quantity
+FROM
+  `my-project-test-402823.data.orders`
+WHERE
+  product_id = 'FUR-TA-10000577'
+GROUP BY
+  product_id,
+  sales,
+  quantity,
+  region
+ORDER BY 
+  region
+
+-- também podemos avaliar o ship_mode, mas tbm temos variação no preço por de tratar de dados de produto
+
+-- qtd compras clientes
+SELECT
+  customer_name,
+  count (distinct order_id) as total_pedidos
+  
+FROM
+  `my-project-test-402823.data.orders`
+
+GROUP BY
+  customer_name
+ORDER BY
+  total_pedidos DESC
+
+
+-- conferindo as datas, se não dá data de envio anterior a data do pedido
+SELECT
+  order_id,
+  order_date,
+  ship_date
+FROM
+  `my-project-test-402823.data.orders`
+WHERE
+  ship_date < order_date;
+
+
+aqui nós podemos verificar que um determinado cliente pode fazer pedidos para mais de uma região
+
+SELECT
+  customer_id,
+  COUNT(DISTINCT region) AS count_of_regions
+FROM
+  `my-project-test-402823.data.orders`
+WHERE
+  customer_id = 'BH-11710'
+GROUP BY
+  customer_id
+HAVING
+  COUNT(DISTINCT region) > 1
